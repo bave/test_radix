@@ -4,7 +4,8 @@ all: bsd test_bsd test_radixter
 radixter_update: radixter
 	@echo ""
 	@echo "radixter is cloned repository by https://github.com/ytakano/radix_tree.git"
-	cd radixter && git pull
+	#git submodule update
+	#cd radixter && git pull
 
 bsd:
 	make -C bsd_radix
