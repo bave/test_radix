@@ -1,11 +1,11 @@
 all: bsd test_bsd test_radixter
 .PHONY : all
 
-radixter_update: radixter
+init_radixter: radixter
 	@echo ""
 	@echo "radixter is cloned repository by https://github.com/ytakano/radix_tree.git"
-	#git submodule update
-	#cd radixter && git pull
+	git submodule init
+	git submodule update
 
 bsd:
 	make -C bsd_radix
