@@ -1,11 +1,41 @@
 #include <iostream>
 
+#include <stdio.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
 #include "route/route.hpp"
 #include "radixter/radix_tree.hpp"
+
+#define TCHK_START(name)           \
+    struct timeval name##_prev;    \
+    struct timeval name##_current; \
+    gettimeofday(&name##_prev, NULL)
+
+#define TCHK_END(name)                                                             \
+gettimeofday(&name##_current, NULL);                                               \
+time_t name##_sec;                                                                 \
+suseconds_t name##_usec;                                                           \
+if (name##_current.tv_sec == name##_prev.tv_sec) {                                 \
+    name##_sec = name##_current.tv_sec - name##_prev.tv_sec;                       \
+    name##_usec = name##_current.tv_usec - name##_prev.tv_usec;                    \
+} else if (name ##_current.tv_sec != name##_prev.tv_sec) {                         \
+    int name##_carry = 1000000;                                                    \
+    name##_sec = name##_current.tv_sec - name##_prev.tv_sec;                       \
+    if (name##_prev.tv_usec > name##_current.tv_usec) {                            \
+        name##_usec = name##_carry - name##_prev.tv_usec + name##_current.tv_usec; \
+        name##_sec--;                                                              \
+        if (name##_usec > name##_carry) {                                          \
+            name##_usec = name##_usec - name##_carry;                              \
+            name##_sec++;                                                          \
+        }                                                                          \
+    } else {                                                                       \
+        name##_usec = name##_current.tv_usec - name##_prev.tv_usec;                \
+    }                                                                              \
+}                                                                                  \
+printf("%s: sec:%lu usec:%06ld\n", #name, name##_sec, name##_usec); 
 
 class rtentry {
 public:
@@ -66,18 +96,6 @@ radix_substr(const rtentry &entry, int begin, int num)
     return ret;
 }
 
-rtentry
-radix_join(const rtentry &entry1, const rtentry &entry2)
-{
-    rtentry ret;
-
-    ret.addr        = entry1.addr;
-    ret.addr       |= entry2.addr >> entry1.prefix_len;
-    ret.prefix_len  = entry1.prefix_len + entry2.prefix_len;
-
-    return ret;
-}
-
 int
 main(int argc, char **argv)
 {
@@ -86,22 +104,28 @@ main(int argc, char **argv)
     class rtentry entry;
 
     for (int i=0; i<route.size(); i++) {
-        entry.addr = route.n_key[i];
+        entry.addr = ntohl(route.n_key[i]);
         entry.prefix_len = atoi(route.mask[i].c_str());
 
+        /*
         printf("%d\n", i);
         route.memdump(&entry.addr, sizeof(uint32_t));
         route.memdump(&entry.prefix_len, sizeof(int));
+        */
 
-        rttable[entry] = route.n_value[i];
+        rttable[entry] = ntohl(route.n_value[i]);
     }
 
-    /*
-    add_rtentry("0.0.0.0", 0, "192.168.0.1");
-    find_route("172.20.0.1");
-    rm_rtentry("10.0.0.0", 8);
-    find_route("10.1.1.1");
-    */
+    
+    //printf("check_start\n");
+
+    TCHK_START(hoge);
+    for (int i=0; i<route.size(); i++) {
+        entry.addr = ntohl(route.n_key[i]);
+        entry.prefix_len = 32;
+        rttable.longest_match(entry);
+    }
+    TCHK_END(hoge);
 
     return 0;
 }

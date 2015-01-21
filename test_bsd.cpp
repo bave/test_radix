@@ -59,7 +59,7 @@ main(int argc, char** argv)
                 (void*)&route.sin_mask[i], rnh, (struct radix_node*)mn);
     }
 
-    printf("check_start\n");
+    //printf("check_start\n");
     
     TCHK_START(hoge);
     for (int i=0; i<route.size(); i++) {
