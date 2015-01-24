@@ -61,7 +61,7 @@ main(int argc, char** argv)
 
     //printf("check_start\n");
     
-    TCHK_START(hoge);
+    TCHK_START(lookup);
     for (int i=0; i<route.size(); i++) {
         struct my_node* mn;
         /*
@@ -78,7 +78,7 @@ main(int argc, char** argv)
         }
         */
     }
-    TCHK_END(hoge);
+    TCHK_END(lookup);
 
     return 0;
 }

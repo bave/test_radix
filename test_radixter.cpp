@@ -119,13 +119,13 @@ main(int argc, char **argv)
     
     //printf("check_start\n");
 
-    TCHK_START(hoge);
+    TCHK_START(lookup);
     for (int i=0; i<route.size(); i++) {
         entry.addr = ntohl(route.n_key[i]);
         entry.prefix_len = 32;
         rttable.longest_match(entry);
     }
-    TCHK_END(hoge);
+    TCHK_END(lookup);
 
     return 0;
 }
