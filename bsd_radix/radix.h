@@ -144,7 +144,7 @@ struct radix_node_head {
 };
 
 #ifndef _KERNEL
-#define R_Malloc(p, t, n) (p = (t) printf("malloc!\n"); malloc((unsigned int)(n)))
+#define R_Malloc(p, t, n) (p = (t) malloc((unsigned int)(n)))
 #define R_Zalloc(p, t, n) (p = (t) calloc(1,(unsigned int)(n)))
 #define Free(p) free((char *)p);
 #else
