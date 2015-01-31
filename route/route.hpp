@@ -36,7 +36,7 @@ public:
     bool init(const std::string& s)
     {
         std::ifstream ifs;
-        ifs.open(s, std::ios::in);
+        ifs.open(s.c_str(), std::ios::in);
         if(ifs.fail()) {
             return false;
         }
